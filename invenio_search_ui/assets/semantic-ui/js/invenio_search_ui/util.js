@@ -15,14 +15,22 @@ import _camelCase from "lodash/camelCase";
 export function createSearchAppInit(
   defaultComponents,
   autoInit = true,
-  autoInitDataAttr = "invenio-search-config"
+  autoInitDataAttr = "invenio-search-config",
+  allowMultipleApps = false
 ) {
   const initSearchApp = (rootElement) => {
-    const config = JSON.parse(
+    const { appId, ...config } = JSON.parse(
       rootElement.dataset[_camelCase(autoInitDataAttr)]
     );
-    loadComponents(config.appId, defaultComponents).then((res) => {
-      ReactDOM.render(<SearchApp config={config} />, rootElement);
+    loadComponents(appId, defaultComponents).then((res) => {
+      ReactDOM.render(
+        <SearchApp
+          config={config}
+          // Use appName to namespace application components when overriding
+          {...(allowMultipleApps && { appName: appId })}
+        />,
+        rootElement
+      );
     });
   };
 
